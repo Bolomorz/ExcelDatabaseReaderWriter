@@ -39,9 +39,10 @@ namespace ConsoleApp1
         {
             string ret = string.Empty;
 
-            var con = new MySqlConnection(connection);
+            var con = new MySqlConnection();
             try
             {
+                con = new MySqlConnection(connection);
                 con.Open();
                 var cmd = new MySqlCommand();
                 cmd.Connection = con;
@@ -72,9 +73,10 @@ namespace ConsoleApp1
             string message = string.Empty;
             List<List<string>> rows = new List<List<string>>();
 
-            var con = new MySqlConnection(connection);
+            var con = new MySqlConnection();
             try
             {
+                con = new MySqlConnection(connection);
                 con.Open();
                 var cmd = new MySqlCommand(command, con);
                 MySqlDataReader rdr = cmd.ExecuteReader();
