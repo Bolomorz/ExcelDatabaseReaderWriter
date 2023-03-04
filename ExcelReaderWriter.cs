@@ -34,6 +34,11 @@ namespace ConsoleApp1
                     Console.WriteLine(ex.Message);
                 }
             }
+            else
+            {
+                Console.WriteLine("File does not exist!");
+                opened = false;
+            }
         }
 
         /// <summary>
@@ -116,8 +121,6 @@ namespace ConsoleApp1
 
             Marshal.FinalReleaseComObject(worksheet);
             Marshal.FinalReleaseComObject(sheets);
-
-            object misValue = System.Reflection.Missing.Value;
 
             workbook.Close(0);
             Marshal.FinalReleaseComObject(workbook);
