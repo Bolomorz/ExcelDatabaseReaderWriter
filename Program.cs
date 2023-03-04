@@ -11,7 +11,7 @@ string update = "UPDATE tbl_fahrrad SET FrdMarke = 'Giant' WHERE FrdNr = 1";
 string com = fahrradverleihdb.Command(update);
 if(com == string.Empty)
 {
-    Console.WriteLine(update + " was successfull!");
+    Console.WriteLine(update + " was successful!");
 }
 else
 {
@@ -22,7 +22,7 @@ string select = "SELECT f.FrdNr, f.FrdMarke FROM tbl_fahrrad f";
 Tuple<string, List<List<string>>> ret = fahrradverleihdb.Select(select, 2);
 if(ret.Item1 == string.Empty)
 {
-    Console.WriteLine(select + " was successfull!");
+    Console.WriteLine(select + " was successful!");
     foreach (List<string> row in ret.Item2)
     {
         Console.WriteLine("FrdNr: " + row[0] + "; FrdMarke: " + row[1]);
@@ -41,10 +41,28 @@ else
 //---
 //Excel
 ExcelReaderWriter example = new ExcelReaderWriter(@"U:\MyExcel.xlsx");
-example.WriteCell("A1", "example");
-string read = example.ReadCell("A1");
-Console.WriteLine(read);
-example.SaveAndDispose();
+string message = example.WriteCell("A1", "example");
+if(message == string.Empty)
+{
+    Console.WriteLine("WriteCell was successful!");
+}
+else
+{
+    Console.WriteLine(message);
+}
+
+Tuple<string, string> ret2 = example.ReadCell("A1");
+if(ret2.Item1 == string.Empty)
+{
+    Console.WriteLine("ReadCell was successful!");
+    Console.WriteLine(ret2.Item2);
+}
+else
+{
+    Console.WriteLine(ret2.Item1);
+}
+
+example.QuitAndDispose();
 //---
 //--
 //-

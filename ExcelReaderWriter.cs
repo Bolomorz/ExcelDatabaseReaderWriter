@@ -42,19 +42,29 @@ namespace ConsoleApp1
         /// </summary>
         /// <param name="cell"></param>
         /// <returns></returns>
-        public string ReadCell(string cell)
+        public Tuple<string, string> ReadCell(string cell)
         {
-            string ret = string.Empty;
+            string value = string.Empty;
+
+            string message = string.Empty;
+
             if (opened) { 
                 try
                 {
-                    ret = worksheet.Cells[cell].Value2.ToString();
+                    value = worksheet.Cells[cell].Value2.ToString();
                 }
                 catch (Exception ex)
                 {
-                 Console.WriteLine(ex.Message);
+                    message = ex.Message;
                 }
             }
+            else
+            {
+                message = "App closed!";
+            }
+
+            Tuple<string, string> ret = new Tuple<string, string>(message, value);
+
             return ret;
         }
 
@@ -63,25 +73,43 @@ namespace ConsoleApp1
         /// </summary>
         /// <param name="cell"></param>
         /// <param name="value"></param>
-        public void WriteCell(string cell, string value)
+        public string WriteCell(string cell, string value)
         {
+            string ret = string.Empty;
+
             if (opened)
             {
                 try
                 {
                     worksheet.Cells[cell].Value2 = value;
+                    SaveChanges();
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    ret = ex.Message;
                 }
             }
+            else
+            {
+                ret = "App closed!";
+            }
+
+            return ret;
+        }
+
+        public void SaveChanges()
+        {
+            object misValue = System.Reflection.Missing.Value;
+
+            workbook.AcceptAllChanges();
+            workbook.SaveAs2(path, excel.XlFileFormat.xlOpenXMLWorkbook, misValue, misValue, misValue, misValue, excel.XlSaveAsAccessMode.xlExclusive, misValue, misValue, misValue, misValue, misValue);
+
         }
 
         /// <summary>
         /// save changes and dispose objects to kill all processes
         /// </summary>
-        public void SaveAndDispose()
+        public void QuitAndDispose()
         {
             GC.Collect();
             GC.WaitForPendingFinalizers();
@@ -91,13 +119,13 @@ namespace ConsoleApp1
 
             object misValue = System.Reflection.Missing.Value;
 
-            workbook.AcceptAllChanges();
-            workbook.SaveAs2(path, excel.XlFileFormat.xlOpenXMLWorkbook, misValue, misValue, misValue, misValue, excel.XlSaveAsAccessMode.xlExclusive, misValue, misValue, misValue, misValue, misValue);
             workbook.Close(0);
             Marshal.FinalReleaseComObject(workbook);
 
             application.Quit();
             Marshal.FinalReleaseComObject(application);
+
+            opened = false;
         }
     }
 }
