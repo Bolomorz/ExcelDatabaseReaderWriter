@@ -119,7 +119,14 @@ namespace ConsoleApp1
         {
             try
             {
-                workbook.SaveAs(path);
+                if(File.Exists(path))
+                {
+                    workbook.Save();
+                }
+                else
+                {
+                    workbook.SaveAs2(path);
+                }
             }
             catch (Exception ex)
             {
@@ -129,7 +136,7 @@ namespace ConsoleApp1
         }
 
         /// <summary>
-        /// save changes and dispose objects to kill all processes
+        /// Quit Process
         /// </summary>
         public void Quit()
         {
