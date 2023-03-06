@@ -40,8 +40,8 @@ else
 //--
 //---
 //Excel
-ExcelReaderWriter example = new ExcelReaderWriter(@"U:\MyExcel.xlsx");
-string message = example.WriteCell("A1", "example");
+ExcelReaderWriter example = new ExcelReaderWriter(@"C:\Users\domin\OneDrive\Dokumente\testexcel.xlsx");
+string message = example.WriteCell(1,1, "example");
 if(message == string.Empty)
 {
     Console.WriteLine("WriteCell was successful!");
@@ -51,7 +51,7 @@ else
     Console.WriteLine(message);
 }
 
-Tuple<string, string> ret2 = example.ReadCell("A1");
+Tuple<string, string> ret2 = example.ReadCell(1,1);
 if(ret2.Item1 == string.Empty)
 {
     Console.WriteLine("ReadCell was successful!");
@@ -62,7 +62,8 @@ else
     Console.WriteLine(ret2.Item1);
 }
 
-example.QuitAndDispose();
+example.SaveChanges();
+example.Quit();
 //---
 //--
 //-

@@ -25,7 +25,7 @@ namespace ConsoleApp1
                     application = new excel.Application();
                     workbook = application.Workbooks.Open(filepath);
                     sheets = workbook.Sheets;
-                    worksheet = sheets[0];
+                    worksheet = sheets[1];
                     opened = true;
                     path = filepath;
                 }
@@ -36,8 +36,19 @@ namespace ConsoleApp1
             }
             else
             {
-                Console.WriteLine("File does not exist!");
-                opened = false;
+                try
+                {
+                    application = new excel.Application();
+                    workbook = application.Workbooks.Add();
+                    sheets = workbook.Sheets;
+                    worksheet = workbook.ActiveSheet;
+                    opened = true;
+                    path = filepath;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
             }
         }
 
@@ -47,7 +58,7 @@ namespace ConsoleApp1
         /// </summary>
         /// <param name="cell"></param>
         /// <returns></returns>
-        public Tuple<string, string> ReadCell(string cell)
+        public Tuple<string, string> ReadCell(int row, int column)
         {
             string value = string.Empty;
 
@@ -56,7 +67,7 @@ namespace ConsoleApp1
             if (opened) { 
                 try
                 {
-                    value = worksheet.Cells[cell].Value2.ToString();
+                    value = worksheet.Cells[row, column].Value2.ToString();
                 }
                 catch (Exception ex)
                 {
@@ -78,7 +89,7 @@ namespace ConsoleApp1
         /// </summary>
         /// <param name="cell"></param>
         /// <param name="value"></param>
-        public string WriteCell(string cell, string value)
+        public string WriteCell(int row, int column, string value)
         {
             string ret = string.Empty;
 
@@ -86,8 +97,7 @@ namespace ConsoleApp1
             {
                 try
                 {
-                    worksheet.Cells[cell].Value2 = value;
-                    SaveChanges();
+                    worksheet.Cells[row, column].Value2 = value;
                 }
                 catch (Exception ex)
                 {
@@ -102,32 +112,29 @@ namespace ConsoleApp1
             return ret;
         }
 
+        /// <summary>
+        /// Save file.
+        /// </summary>
         public void SaveChanges()
         {
-            object misValue = System.Reflection.Missing.Value;
-
-            workbook.AcceptAllChanges();
-            workbook.SaveAs2(path, excel.XlFileFormat.xlOpenXMLWorkbook, misValue, misValue, misValue, misValue, excel.XlSaveAsAccessMode.xlExclusive, misValue, misValue, misValue, misValue, misValue);
+            try
+            {
+                workbook.SaveAs(path);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
 
         }
 
         /// <summary>
         /// save changes and dispose objects to kill all processes
         /// </summary>
-        public void QuitAndDispose()
+        public void Quit()
         {
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-
-            Marshal.FinalReleaseComObject(worksheet);
-            Marshal.FinalReleaseComObject(sheets);
-
             workbook.Close(0);
-            Marshal.FinalReleaseComObject(workbook);
-
             application.Quit();
-            Marshal.FinalReleaseComObject(application);
-
             opened = false;
         }
     }
