@@ -51,7 +51,7 @@ else
     Console.WriteLine(message);
 }
 
-Tuple<string, string> ret2 = example.ReadCell(1,1);
+Tuple<string, object> ret2 = example.ReadCell(1,1);
 if(ret2.Item1 == string.Empty)
 {
     Console.WriteLine("ReadCell was successful!");
@@ -61,9 +61,6 @@ else
 {
     Console.WriteLine(ret2.Item1);
 }
-
-example.SaveChanges();
-example.Quit();
 //---
 //--
 //-

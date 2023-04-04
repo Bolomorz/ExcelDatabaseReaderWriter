@@ -18,38 +18,7 @@ namespace ConsoleApp1
         string path;
         public ExcelReaderWriter(string filepath)
         {
-            if (File.Exists(filepath))
-            {
-                try
-                {
-                    application = new excel.Application();
-                    workbook = application.Workbooks.Open(filepath);
-                    sheets = workbook.Sheets;
-                    worksheet = sheets[1];
-                    opened = true;
-                    path = filepath;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-            }
-            else
-            {
-                try
-                {
-                    application = new excel.Application();
-                    workbook = application.Workbooks.Add();
-                    sheets = workbook.Sheets;
-                    worksheet = workbook.ActiveSheet;
-                    opened = true;
-                    path = filepath;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-            }
+            path = filepath;
         }
 
         /// <summary>
@@ -58,16 +27,18 @@ namespace ConsoleApp1
         /// </summary>
         /// <param name="cell"></param>
         /// <returns></returns>
-        public Tuple<string, string> ReadCell(int row, int column)
+        public Tuple<string, object> ReadCell(int row, int column)
         {
-            string value = string.Empty;
+            EstablishConnection();
+            
+            object value = string.Empty;
 
             string message = string.Empty;
 
             if (opened) { 
                 try
                 {
-                    value = worksheet.Cells[row, column].Value2.ToString();
+                    value = worksheet.Cells[row, column].Value2;
                 }
                 catch (Exception ex)
                 {
@@ -79,7 +50,10 @@ namespace ConsoleApp1
                 message = "App closed!";
             }
 
-            Tuple<string, string> ret = new Tuple<string, string>(message, value);
+            Tuple<string, object> ret = new Tuple<string, object>(message, value);
+
+            SaveChanges();
+            Quit();
 
             return ret;
         }
@@ -89,8 +63,10 @@ namespace ConsoleApp1
         /// </summary>
         /// <param name="cell"></param>
         /// <param name="value"></param>
-        public string WriteCell(int row, int column, string value)
+        public string WriteCell(int row, int column, object value)
         {
+            EstablishConnection();
+            
             string ret = string.Empty;
 
             if (opened)
@@ -109,13 +85,50 @@ namespace ConsoleApp1
                 ret = "App closed!";
             }
 
+            SaveChanges();
+            Quit();
+
             return ret;
+        }
+
+        private void EstablishConnection()
+        {
+            if (File.Exists(path))
+            {
+                try
+                {
+                    application = new excel.Application();
+                    workbook = application.Workbooks.Open(path);
+                    sheets = workbook.Sheets;
+                    worksheet = sheets[1];
+                    opened = true;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+            else
+            {
+                try
+                {
+                    application = new excel.Application();
+                    workbook = application.Workbooks.Add();
+                    sheets = workbook.Sheets;
+                    worksheet = workbook.ActiveSheet;
+                    opened = true;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
         }
 
         /// <summary>
         /// Save file.
         /// </summary>
-        public void SaveChanges()
+        private void SaveChanges()
         {
             try
             {
@@ -138,7 +151,7 @@ namespace ConsoleApp1
         /// <summary>
         /// Quit Process
         /// </summary>
-        public void Quit()
+        private void Quit()
         {
             workbook.Close(0);
             application.Quit();
