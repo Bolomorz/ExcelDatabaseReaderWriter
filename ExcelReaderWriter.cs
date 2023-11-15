@@ -8,17 +8,18 @@ using excel = Microsoft.Office.Interop.Excel;   //Library for Excel
 
 namespace ConsoleApp1
 {
-    internal class ExcelReaderWriter
+    public class ExcelReaderWriter
     {
-        excel.Application application;
-        excel.Workbook workbook;
-        excel.Sheets sheets;
-        excel.Worksheet worksheet;
+        excel.Application? application;
+        excel.Workbook? workbook;
+        excel.Sheets? sheets;
+        excel.Worksheet? worksheet;
         bool opened;
         string path;
         public ExcelReaderWriter(string filepath)
         {
             path = filepath;
+            opened = false;
         }
 
         /// <summary>
@@ -27,13 +28,13 @@ namespace ConsoleApp1
         /// </summary>
         /// <param name="cell"></param>
         /// <returns></returns>
-        public Tuple<string, object> ReadCell(int row, int column)
+        public Tuple<string?, object?> ReadCell(int row, int column)
         {
             EstablishConnection();
             
-            object value = string.Empty;
+            object? value = null;
 
-            string message = string.Empty;
+            string? message = null;
 
             if (opened) { 
                 try
@@ -50,7 +51,7 @@ namespace ConsoleApp1
                 message = "App closed!";
             }
 
-            Tuple<string, object> ret = new Tuple<string, object>(message, value);
+            Tuple<string?, object?> ret = new Tuple<string?, object?>(message, value);
 
             SaveChanges();
             Quit();
@@ -63,11 +64,11 @@ namespace ConsoleApp1
         /// </summary>
         /// <param name="cell"></param>
         /// <param name="value"></param>
-        public string WriteCell(int row, int column, object value)
+        public string? WriteCell(int row, int column, object value)
         {
             EstablishConnection();
             
-            string ret = string.Empty;
+            string? ret = null;
 
             if (opened)
             {
@@ -91,6 +92,9 @@ namespace ConsoleApp1
             return ret;
         }
 
+        /// <summary>
+        /// Establish connection to excel application with file in path.
+        /// </summary>
         private void EstablishConnection()
         {
             if (File.Exists(path))
@@ -149,7 +153,7 @@ namespace ConsoleApp1
         }
 
         /// <summary>
-        /// Quit Process
+        /// Quit Process.
         /// </summary>
         private void Quit()
         {

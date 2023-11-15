@@ -8,36 +8,30 @@ using MySql.Data.MySqlClient;       //Library for SQL
 
 namespace ConsoleApp1
 {
-    internal class DatabaseReaderWriter
+    public class DatabaseReaderWriter
     {
+        public struct Query
+        {
+            public string? errormessage;
+            public List<List<object>>? rows;
+        }
+        
         private string connection;
 
-        public DatabaseReaderWriter(string server, string database, string userid, string password)
+        public DatabaseReaderWriter(string _connection) 
         {
-            connection = "";
-            connection += "server=" + server;
-            connection += ";database=" + database;
-            connection += ";userid=" + userid;
-            connection += ";password=" + password;
-        }
-
-        public DatabaseReaderWriter(string server, string database, string userid) 
-        {
-            connection = "";
-            connection += "server=" + server;
-            connection += ";database=" + database;
-            connection += ";userid=" + userid;
+            connection = _connection;
         }
 
         /// <summary>
-        /// UPDATE, INSERT INTO, DELETE commands.
+        /// Non Query commands.
         /// returns string.Empty if successfull, Exception ex if thrown.
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public string Command(string command)
+        public string? CommandNonQuery(string command)
         {
-            string ret = string.Empty;
+            string? ret = null;
 
             var con = new MySqlConnection();
             try
@@ -61,17 +55,16 @@ namespace ConsoleApp1
         }
 
         /// <summary>
-        /// SELECT command.
+        /// QUERY command.
         /// returns string.Empty if successfull, Exception ex if thrown.
         /// returns List of rows. Each row as a List of strings.
         /// </summary>
         /// <param name="command"></param>
-        /// <param name="columns"></param>
         /// <returns></returns>
-        public Tuple<string, List<List<string>>> Select(string command, int columns)
+        public Query CommandQuery(string command)
         {
-            string message = string.Empty;
-            List<List<string>> rows = new List<List<string>>();
+            string? message = null;
+            List<List<object>> rows = new List<List<object>>();
 
             var con = new MySqlConnection();
             try
@@ -82,10 +75,10 @@ namespace ConsoleApp1
                 MySqlDataReader rdr = cmd.ExecuteReader();
                 while(rdr.Read())
                 {
-                    List<string> row = new List<string>();
-                    for(int i = 0; i < columns; i++)
+                    List<object> row = new List<object>();
+                    for(int i = 0; i < rdr.FieldCount; i++)
                     {
-                        row.Add(rdr[i].ToString());
+                        row.Add(rdr[i]);
                     }
                     rows.Add(row);
                 }
@@ -99,7 +92,7 @@ namespace ConsoleApp1
                 con.Close();
             }
 
-            Tuple<string, List<List<string>>> ret = new Tuple<string, List<List<string>>>(message, rows);
+            Query ret = new Query() { errormessage = message, rows = rows};
             return ret;
         }
     }
